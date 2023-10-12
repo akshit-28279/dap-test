@@ -1,0 +1,567 @@
+location ~ ^/_status {
+    access_log /var/log/nginx/dap_status.access.log main;
+    error_log  /var/log/nginx/dap_status.error.log;
+    return 200 'OK';
+}
+
+location ~ ^/v1/data/users {
+    more_set_headers 'Content-Type: application/json charset=UTF-8';
+    return 200 '{            "response"              : {                "sendMessage"       : "true"            }        }'; 
+}
+
+location ~ ^/v1/mobile/getopcirclebyrange {
+    limit_req zone=mnp burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/mnp.access.log  main if=$loggable;
+    error_log  /var/log/nginx/mnp.error.log;
+    set $url http://mnp.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/recharge/userplans {
+    limit_req zone=userplans burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/userplan.access.log  main if=$loggable;
+    error_log  /var/log/nginx/userplan.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common.lua;
+    set $url http://internal-billpayments-ffrecharge-alb-1231042015.ap-south-1.elb.amazonaws.com;
+    proxy_pass $url;
+}
+
+location ~ ^/cst/ {
+    limit_req zone=cst burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cst.error.log;
+    set $url http://cst-infra.paytmdgt.io;
+    proxy_set_header host cst-infra.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/help-section {
+    limit_req zone=helpsection burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://ffrweb.prod.paytmdgt.io/v1/help;
+    access_log /var/log/nginx/help.access.log  main if=$loggable;
+    error_log  /var/log/nginx/help.error.log;
+    proxy_pass $url$is_args$args;
+}
+
+location ~ ^/diy/ {
+    limit_req zone=userdiy burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://userdiy.prod.paytmdgt.io;
+    access_log /var/log/nginx/diy.access.log  main if=$loggable;
+    error_log  /var/log/nginx/diy.error.log;
+    rewrite /diy/(.*) /$1  break;
+    proxy_set_header host userdiy.prod.paytmdgt.io;
+    proxy_pass $url;
+ }
+
+
+ location ~ ^/monitoring/ {
+    limit_req zone=monitoring burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://inoperator.prod.paytmdgt.io;
+    access_log /var/log/nginx/monitoring.access.log  main if=$loggable;
+    error_log  /var/log/nginx/monitoring.error.log;
+    rewrite /monitoring/(.*) /$1  break;
+    proxy_pass $url;
+  }
+
+location ~ ^/managefee/ {
+    limit_req zone=managefee burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://managefee-internal.prod.paytmdgt.io;
+    access_log /var/log/nginx/managefee.access.log  main if=$loggable;
+    error_log  /var/log/nginx/managefee.error.log;
+    rewrite /managefee/(.*) /$1  break;
+    proxy_set_header host managefee-internal.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/user-helps {
+    limit_req zone=cstnav burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cstnav.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cstnav.error.log;   
+    set $url http://navengine-internal.prod.paytmdgt.io;
+    proxy_set_header host cstnav.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/chat-bot/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chatbot.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chatbot.error.log;
+    set $url http://chat-bot.paytmdgt.io;
+    proxy_set_header host chat-bot.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/localisation/ {
+    limit_req zone=localisation burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://localisation.paytm.com;
+    access_log /var/log/nginx/localisation.access.log main if=$loggable;
+    error_log  /var/log/nginx/localisation.error.log;
+    rewrite /localisation/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-manager/ {
+    limit_req zone=cstmanager burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://internal-cst-manger-panel-prod-1229590049.ap-southeast-1.elb.amazonaws.com;
+    access_log /var/log/nginx/cst-manager.access.log main;
+    error_log  /var/log/nginx/cst-manager.error.log;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-care/ {
+    limit_req zone=cstcare burst=25 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://10.4.52.160;
+    access_log /var/log/nginx/cst-care.access.log main;
+    error_log  /var/log/nginx/cst-care.error.log;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/loyalty-cards/ {
+    limit_req zone=loyalty-cards burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/loyality-cards.access.log  main if=$loggable;
+    error_log  /var/log/nginx/loyality-cards.error.log;
+    set $url http://loyalty.prod.paytmdgt.io;
+    allow 13.126.250.93;
+    allow 182.73.182.126;
+    allow 180.179.202.112;
+    allow 103.115.212.2;
+    allow 104.115.38.0/24;
+    allow 104.120.139.0/24;
+    allow 104.124.54.0/24;
+    allow 104.71.131.0/24;
+    allow 104.97.78.0/24;
+    allow 115.112.2.0/24;
+    allow 115.248.238.0/24;
+    allow 123.63.250.128/26;
+    allow 124.124.201.128/25;
+    allow 125.56.222.0/24;
+    allow 173.222.148.0/24;
+    allow 173.223.235.0/24;
+    allow 184.50.85.0/24;
+    allow 184.51.151.0/24;
+    allow 184.51.199.0/24;
+    allow 2.16.106.0/24;
+    allow 2.18.240.0/24;
+    allow 23.11.214.0/24;
+    allow 23.11.215.0/24;
+    allow 23.198.11.0/24;
+    allow 23.203.63.0/24;
+    allow 23.205.127.0/24;
+    allow 23.211.135.0/24;
+    allow 23.212.50.0/24;
+    allow 23.216.10.0/24;
+    allow 23.44.4.0/24;
+    allow 23.45.91.0/24;
+    allow 23.57.75.0/24;
+    allow 23.57.76.0/24;
+    allow 23.63.110.0/24;
+    allow 23.65.124.0/24;
+    allow 23.76.156.0/24;
+    allow 23.79.240.0/24;
+    allow 49.44.121.0/25;
+    allow 49.44.137.0/24;
+    allow 49.44.216.0/25;
+    allow 72.246.150.0/24;
+    allow 72.246.216.0/24;
+    allow 96.17.169.0/24;
+    allow 96.17.180.0/24;
+    deny all;
+    proxy_pass $url;
+}
+
+
+location ~ ^/booking/v1/seller/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/booking.access.log main;
+    error_log  /var/log/nginx/booking.error.log;
+    set $url http://internal-digital-booking-engine-alb-299786861.ap-south-1.elb.amazonaws.com;
+    rewrite /booking/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/booking/v1/inventory/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/booking.access.log main;
+    error_log  /var/log/nginx/booking.error.log;
+    set $url http://internal-digital-booking-engine-alb-299786861.ap-south-1.elb.amazonaws.com;
+    rewrite /booking/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/mw/issue-aggregator/ {
+    limit_req zone=mw burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-ruleengine.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cst-ruleengine.error.log;
+    set $url http://cst-ruleengine.prod.paytmdgt.io;
+    rewrite /v1/mw/issue-aggregator/(.*) /v1/issue-aggregator/$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/mw/ {
+    limit_req zone=mw burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/mw.access.log  main if=$loggable;
+    error_log  /var/log/nginx/mw.error.log;
+    set $url http://internal-digiatl-cst-producer-alb-10993766.ap-south-1.elb.amazonaws.com;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-order-aggregator/ {
+    limit_req zone=mw burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-order-aggregator.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cst-order-aggregator.error.log;
+    set $url http://cst-order-aggregator.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/ts/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/ticketing.agentbot.access.log  main if=$loggable;
+    error_log  /var/log/nginx/ticketing.agentbot.error.log;
+    set $url http://ticketing-agentbot.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/prime/cstinfo {
+    limit_req zone=primesellerpanel burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://internal-digiatl-paytmprime-alb-1738235271.ap-south-1.elb.amazonaws.com;
+    access_log /var/log/nginx/primesellerpanel.access.log  main if=$loggable;
+    error_log  /var/log/nginx/primesellerpanel.error.log;
+    proxy_pass $url;
+}
+
+location ~ ^/cstmanagerpanel/ {
+    limit_req zone=cstmanagerpanel burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://10.4.52.198;
+    access_log /var/log/nginx/cstmanagerpanel.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cstmanagerpanel.error.log;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/cst/bharatbillpay/cms {
+    limit_req zone=bbps burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header Host bbps_to_paytm_proxy.paytmbank.com;
+    access_log /var/log/nginx/bbps.access.log  main if=$loggable;
+    error_log  /var/log/nginx/bbps.error.log;
+    set $url https://internal-digiatl-bbps-common-alb-1989143595.ap-south-1.elb.amazonaws.com;
+    proxy_pass $url;
+}
+
+location = /ebps/v1/ebps/bills/get {
+    limit_req zone=ebpsv1 burst=2000;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalebps.prod.paytmdgt.io;
+    access_log /var/log/nginx/digitalebpsv1.access.log main;
+    error_log  /var/log/nginx/digitalebpsv1.error.log;
+    rewrite /ebps/(.*) /$1  break;
+    allow 13.232.61.221;
+    allow 13.233.123.205;  # Axis bank ip - IN-8831
+    allow 13.232.53.207;   # Axis bank ip - IN-8831
+    allow 52.66.190.98;
+    allow 13.126.34.103;
+    deny all;
+    proxy_pass $url;
+}
+
+location ~ ^/ebps/generatetoken/client1 {
+    limit_req zone=ebpsv4 burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalebps.prod.paytmdgt.io;
+    access_log /var/log/nginx/digitalebpsv4.access.log main;
+    error_log  /var/log/nginx/digitalebpsv4.error.log;
+    rewrite /ebps/(.*) /$1  break;
+    allow 203.161.189.116;  # Indus IP ip - IN-33557
+    allow 203.161.189.2;    # Indus Ip - IN-33557
+    deny all;
+    proxy_pass $url;
+}
+
+location ~ ^/ebps/v4/ {
+    limit_req zone=ebpsv4 burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalebps.prod.paytmdgt.io;
+    access_log /var/log/nginx/digitalebpsv4.access.log main;
+    error_log  /var/log/nginx/digitalebpsv4.error.log;
+    rewrite /ebps/(.*) /$1  break;
+    allow 203.161.189.116; # Indus IP ip - IN-33557
+    allow 203.161.189.2;  # Indus Ip - IN-33557
+    deny all;
+    proxy_pass $url;
+}
+
+location ~ ^/ebps/v5/ {
+    limit_req zone=ebpsv5 burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalebps.prod.paytmdgt.io;
+    access_log /var/log/nginx/digitalebpsv5.access.log main;
+    error_log  /var/log/nginx/digitalebpsv5.error.log;
+    rewrite /ebps/(.*) /$1  break;
+    # allow 34.225.118.60; # Nestaway ip - IN-26700
+    # allow 3.224.208.56;  # Nestaway ip - IN-26700
+    deny all;
+    proxy_pass $url;
+}
+
+location ~ ^/ebps/ {
+    limit_req zone=ebps burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalebps.prod.paytmdgt.io;
+    access_log /var/log/nginx/digitalebps.access.log main;
+    error_log  /var/log/nginx/digitalebps.error.log;
+    rewrite /ebps/(.*) /$1  break;
+    allow 13.232.61.221;
+    allow 13.233.123.205;  # Axis bank ip - IN-8831
+    allow 13.232.53.207;   # Axis bank ip - IN-8831
+    allow 52.66.190.98;
+    allow 13.126.34.103;
+    allow 65.0.171.73;     # IN-24556
+    allow 13.235.36.141;   # IN-24556
+    allow 3.108.128.167;   # IN-24556
+    allow 202.59.248.0/24;
+    allow 203.215.51.0/24;
+    allow 10.4.69.0/25;
+    allow 10.4.69.128/25;
+    allow 54.251.151.39;   # singapore ip
+    allow 54.179.186.39;   # singapore ip
+    allow 10.180.1.0/25;
+    allow 10.180.1.128/25;
+    allow 15.206.35.185;
+    allow 13.235.173.127;
+    allow 104.115.38.0/24;
+    allow 104.120.139.0/24;
+    allow 104.124.54.0/24;
+    allow 104.71.131.0/24;
+    allow 104.97.78.0/24;
+    allow 115.112.2.0/24;
+    allow 115.248.238.0/24;
+    allow 123.63.250.128/26;
+    allow 124.124.201.128/25;
+    allow 125.56.222.0/24;
+    allow 173.222.148.0/24;
+    allow 173.223.235.0/24;
+    allow 184.50.85.0/24;
+    allow 184.51.151.0/24;
+    allow 184.51.199.0/24;
+    allow 2.16.106.0/24;
+    allow 2.18.240.0/24;
+    allow 23.11.214.0/24;
+    allow 23.11.215.0/24;
+    allow 23.198.11.0/24;
+    allow 23.203.63.0/24;
+    allow 23.205.127.0/24;
+    allow 23.211.135.0/24;
+    allow 23.212.50.0/24;
+    allow 23.216.10.0/24;
+    allow 23.44.4.0/24;
+    allow 23.45.91.0/24;
+    allow 23.57.75.0/24;
+    allow 23.57.76.0/24;
+    allow 23.63.110.0/24;
+    allow 23.65.124.0/24;
+    allow 23.76.156.0/24;
+    allow 23.79.240.0/24;
+    allow 49.44.121.0/25;
+    allow 49.44.137.0/24;
+    allow 49.44.216.0/25;
+    allow 72.246.150.0/24;
+    allow 72.246.216.0/24;
+    allow 96.17.169.0/24;
+    allow 96.17.180.0/24;
+    deny all;
+    proxy_pass $url;
+}
+
+location ~ ^/tinyurl/create {
+    proxy_set_header Host reminder.prod.paytmdgt.io;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/tinyurl.access.log main;
+    error_log  /var/log/nginx/tinyurl.errorx.log;
+    set $url http://digitalreminder.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ^~ /education/explore/v1/autosuggest {
+    add_header Content-Type application/json;
+    return 200 '{"data”:[]}';
+}
+
+location ^~ /education/explore/v1/page/explore_landing_app/sections {
+    add_header Content-Type application/json;
+    return 200 '[]';
+}
+
+location ^~ /education/explore/v1/page/explore_landing/sections {
+    add_header Content-Type application/json;
+    return 200 '[]';
+}
+
+location ~* /education/explore {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/educationexplore.access.log main;
+    error_log  /var/log/nginx/educationexplore.error.log;
+    set $url http://education-service.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_explore_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ^~ /education/coaching {
+        resolver 10.4.64.2 valid=5s;
+        access_log /var/log/nginx/educationcoaching.access.log main;
+        error_log  /var/log/nginx/educationcoaching.error.log;
+        set $url http://education-service.prod.paytmdgt.io;
+        rewrite /education/(.*) /$1  break;
+        #log_by_lua_file /etc/nginx/lua/datadog/edu_coaching_api_latency.lua;
+        proxy_pass $url;
+}
+
+location ^~ /education/formfbl/ {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/educationfbl.access.log education_forms_log_format;
+    error_log  /var/log/nginx/educationfbl.error.log;
+    set $url http://education-formfbl-internal.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_formsfbl_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ~ ^/bulkActions/v1/order/getBulkActions  {
+    limit_req zone=ffrorderactions burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/ffrorderactions.access.log main;
+    error_log  /var/log/nginx/ffrorderactions.error.log;
+    set $url http://ffrorderactions.prod.paytmdgt.io;
+    proxy_pass $url;
+  }
+
+location ~ ^/aggregateTransaction/ {
+    resolver 10.4.64.2 valid=5s;
+    set $url http://inoperator.prod.paytmdgt.io;
+    access_log /var/log/nginx/rechargeAggregateTransaction.access.log  main if=$loggable;
+    error_log  /var/log/nginx/rechargeAggregateTransaction.error.log;
+    rewrite /aggregateTransaction/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/consumer-bot/ {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=cst burst=10 nodelay;
+    access_log /var/log/nginx/consumer-bot.access.log main;
+    error_log  /var/log/nginx/consumer-bot.error.log;
+    set $url http://consumer-bot.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/billpay-platform/ {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=billpay-platform burst=10 nodelay;
+    access_log /var/log/nginx/billpayment-platform.access.log main;
+    error_log  /var/log/nginx/billpayment-platform.error.log;
+    set $url http://digitalbpap-internal.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/horoscope/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/horoscope.access.log main;
+    error_log  /var/log/nginx/horoscope.error.log;
+    set $url https://miniapps.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/redirect/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/horoscope.access.log main;
+    error_log  /var/log/nginx/horoscope.error.log;
+    set $url https://miniapps.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/oauth2/ {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=billpay-oauth burst=10 nodelay;
+    access_log /var/log/nginx/billpay-oauth.access.log main;
+    error_log  /var/log/nginx/billpay-oauth.error.log;
+    set $url https://accounts.paytm.com;
+    proxy_set_header X-Real-IP $remote_addr;
+    
+    proxy_pass $url;
+}
+
+location ~ ^/enterprise-billpay/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/enterprise-billpay.access.log main;
+    error_log  /var/log/nginx/enterprise-billpay.error.log;
+    set $url http://internal-digital-favourite-alb-543002917.ap-south-1.elb.amazonaws.com;
+    rewrite /enterprise-billpay/(.*) /$1  break;
+    proxy_set_header host recharge-ent.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ^~ /education/oms {
+        resolver 10.4.64.2 valid=5s;
+        access_log /var/log/nginx/educationoms.access.log main;
+        error_log  /var/log/nginx/educationoms.error.log;
+        set $url http://education-oms-internal.prod.paytmdgt.io;
+        rewrite /education/(.*) /$1  break;
+        #log_by_lua_file /etc/nginx/lua/datadog/edu_oms_api_latency.lua;
+        proxy_pass $url;
+}
+
+location ~ ^/cst-ruleengine/ {
+    limit_req zone=mw burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-ruleengine.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cst-ruleengine.error.log;
+    set $url http://cst-ruleengine.prod.paytmdgt.io;
+    rewrite /cst-ruleengine/(.*) /$1  break;
+    proxy_pass $url;
+}  
+
+location ~ ^/cst-ruleengine-admin/ {
+    limit_req zone=mw burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-ruleengine-admin.access.log  main if=$loggable;
+    error_log  /var/log/nginx/cst-ruleengine-admin.error.log;
+    set $url http://ruleengineadmin.prod.paytmdgt.io;
+    rewrite /cst-ruleengine-admin/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location /merchant-notification/ {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/merchant_notification.access.log main;
+    error_log  /var/log/nginx/merchant_notification.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common.lua;
+    set $url http://digital-merchantnotification-internal.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location /iocl/ {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/iocl.access.log main;
+    error_log  /var/log/nginx/iocl.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common.lua;
+    set $url http://billpayments-iocl.paytmdgt.io;
+    proxy_pass $url;
+}

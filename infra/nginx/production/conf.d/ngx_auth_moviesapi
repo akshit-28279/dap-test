@@ -1,0 +1,10 @@
+location = /v1/movies/content/user-cinemas {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/movies-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/movies-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://api.movies-internal.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}

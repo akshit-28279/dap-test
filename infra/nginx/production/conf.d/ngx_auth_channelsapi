@@ -1,0 +1,10 @@
+
+location ~ ^/chlbwp {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chlbwp.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chlbwp.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    set $url http://bwp.channels.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}

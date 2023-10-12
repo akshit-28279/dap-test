@@ -1,0 +1,9 @@
+location ~ ^/feeds/public/api/v2/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/feeds-public-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/feeds-public-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common_cors.lua;
+    set $url https://2p2mi52rh5.execute-api.ap-south-1.amazonaws.com;
+    rewrite /(.*) /prod/$1 break;
+    proxy_pass $url;
+}

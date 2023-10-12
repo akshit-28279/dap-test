@@ -1,0 +1,60 @@
+  location ~ ^/eos/brandCatalogue/getBrandCategory {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret jWnZr4u7w!z%C*F-;
+        proxy_pass $url;
+  }
+
+
+  location ~ ^/eos/brandCatalogue/getProductDetails {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret dSgUkXp2s5v8y/B?;
+        proxy_pass $url;
+  }
+
+
+  location ~ ^/eos/getBankListForBrandEmiCalculator {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret SgVkYp2s5v8y/B?E;
+        proxy_pass $url;
+  }
+
+
+  location ~ ^/eos/brandEmiCalculator {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret JaNdRgUjXn2r5u8x;
+        proxy_pass $url;
+  }
+
+
+   location ~ ^/eos/getBankListForBankEmiCalculator {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret 7w!z%C*F-JaNdRgU;
+        proxy_pass $url;
+  } 
+
+
+   location ~ ^/eos/bankEmiCalculator {
+        resolver 10.4.64.2 valid=5s;
+        set $url https://securegw.paytm.in;
+        access_log /var/log/nginx/miniapp.access.log main;
+        error_log  /var/log/nginx/miniapp.error.log;
+        proxy_set_header clientSecret w!z%C*F-JaNdRgUk;
+        proxy_pass $url;
+
+  }
+

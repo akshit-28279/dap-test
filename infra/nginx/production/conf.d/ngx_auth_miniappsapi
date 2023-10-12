@@ -1,0 +1,75 @@
+location ^~ /h5/user {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    set $msg_null_body "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_401_410 "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_null_userId "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    access_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /h5/auth {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    set $msg_null_body "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_401_410 "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_null_userId "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    access_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /h5/v2/user/app {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    set $msg_null_body "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_401_410 "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_null_userId "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    access_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /h5/v1/user/app {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    set $msg_null_body "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_401_410 "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    set $msg_null_userId "FAILURE, ER_4501, Invalid token, Please login into Paytm App, 401";
+    access_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ~ ^/h5/serverless/digilocker/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/digilocker-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/digilocker-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors_all_http_methods.lua;
+    set $url https://ezc26z0594.execute-api.ap-south-1.amazonaws.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /h5/serverless/uhi/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/uhi-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/uhi-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors_all_http_methods.lua;
+    set $url https://ezc26z0594.execute-api.ap-south-1.amazonaws.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}

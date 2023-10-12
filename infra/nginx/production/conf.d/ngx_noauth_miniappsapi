@@ -1,0 +1,31 @@
+location = /h5/user/v1/app/batch {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common_cors.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /h5/user/app/v1/qr-patterns {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header source dap;
+    access_log /var/log/nginx/miniapps-h5-api.access.log main;
+    error_log  /var/log/nginx/miniapps-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common_cors.lua;
+    set $url https://miniapps-origin.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /h5/serverless/digilocker/api/v1/meta/docdetails {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/digilocker-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/digilocker-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_noauth_common_cors.lua;
+    set $url https://ezc26z0594.execute-api.ap-south-1.amazonaws.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}

@@ -1,0 +1,19 @@
+
+location ~ ^/v2/gratification/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/ads_gratification.access.log main;
+    error_log  /var/log/nginx/ads_gratification.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_userInfo.lua;
+    set $url http://production.moa-decision-engine.ads.inner-route.com;
+    rewrite ^/(.*) /$1  break; 
+    proxy_pass $url;
+}
+location ~ ^/v2/offers/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/ads_offers.access.log main;
+    error_log  /var/log/nginx/ads_offers.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_userInfo.lua;
+    set $url http://production.moa-decision-engine.ads.inner-route.com;
+    rewrite ^/(.*) /$1  break; 
+    proxy_pass $url;
+}

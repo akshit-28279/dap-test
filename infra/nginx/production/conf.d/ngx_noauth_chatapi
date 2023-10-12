@@ -1,0 +1,18 @@
+
+location = /pcchat/api/payOrder/notify{
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/pcchat-order-notify.access.log  main if=$loggable;
+    error_log  /var/log/nginx/pcchat-order-notify.error.log;
+    set $url  http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ~ /pcchat/api/v1/img/merchant(.*) {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/pcchat-order-notify.access.log  main if=$loggable;
+    error_log /var/log/nginx/pcchat-order-notify.error.log;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}

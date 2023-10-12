@@ -1,0 +1,312 @@
+location = /pcchat/api/user/get {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/update {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/register {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/getUserInfoByPhone {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/getUserInfoByUserIds {
+    limit_req zone=chatgetuserinfoip burst=20 nodelay;
+    limit_req zone=chatgetuserinfo burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/v2/api/user/getUserInfoByUserIds {
+    limit_req zone=chatgetuserinfov2ip burst=20 nodelay;
+    limit_req zone=chatgetuserinfov2 burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/v1/user/getUserInfo {
+    limit_req zone=getUserInfoip burst=20 nodelay;
+    limit_req zone=getUserInfo burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /pcchat/api/v1/user/getUserPayInfoByUserIds {
+    limit_req zone=getUserPayInfoip burst=20 nodelay;
+    limit_req zone=getUserPayInfo burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /pcchat/api/user/txNotify {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/getFriendsList {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/block/add {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/block/delete {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+} 
+
+location = /pcchat/api/user/block/list {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}  
+
+location = /pcchat/api/user/block/pageList {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/setting/get {
+    add_header Content-Type application/json;
+    return 200 '{
+        "resultCode": "0",
+        "resultMessage": "success",
+        "success": true,
+        "timeStamp": 1634627033375,
+        "data": {
+            "userId": null,
+            "downloadSettings": "{\\\"camera\\\":\\\"on\\\",\\\"photos\\\":\\\"wifi\\\",\\\"documents\\\":\\\"cellular\\\",\\\"audio\\\":\\\"never\\\"}",
+            "lockScreenNotification": 1,
+            "soundNotification": 1,
+            "appLanguage": "en"
+        }
+    }';
+}
+
+location = /pcchat/api/user/setting/update {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/v1/api/user/groups {
+    limit_req zone=chatgroupsip burst=20 nodelay;
+    limit_req zone=chatgroups burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chat-user-token.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chat-user-token.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location ~/pcchat/v1/api/user/groups/(.*) {
+    limit_req zone=chatgroupsoperationsip burst=20 nodelay;
+    limit_req zone=chatgroupsoperations burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chat-user-token.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chat-user-token.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/v2/api/user/registerSendBird {
+    limit_req zone=chatregistersendbirdip burst=20 nodelay;
+    limit_req zone=chatregistersendbird burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/registerSendBird {
+    limit_req zone=chatregistersendbirdip burst=20 nodelay;
+    limit_req zone=chatregistersendbird burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location = /pcchat/api/user/token {
+    limit_req zone=chatusertokenip burst=20 nodelay;
+    limit_req zone=chatusertoken burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chat-user-token.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chat-user-token.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /pcchat/v1/api/notification/message {
+    limit_req zone=chatreplymessageip burst=20 nodelay;
+    limit_req zone=chatreplymessagesso burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /pcchat/api/v1/split {
+    limit_req zone=chatsplitip burst=20 nodelay;
+    limit_req zone=chatsplit burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ~/pcchat/api/v1/split/(.*) {
+    limit_req zone=chatsplitip burst=20 nodelay;
+    limit_req zone=chatsplit burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/chat-user-block.access.log  main if=$loggable;
+    error_log  /var/log/nginx/chat-user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location = /pcchat/v1/api/user/registerNotify {
+    limit_req zone=chatregisternotifyip burst=20 nodelay;
+    limit_req zone=chatregisternotify burst=20 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/user-block.access.log  main if=$loggable;
+    error_log /var/log/nginx/user-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://paytm-chat-paytmfirstchat-prod.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+    client_max_body_size 7m;
+}
+
+location ~/pcchat/beta/(.*) {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=chatbetaip burst=20 nodelay;
+    limit_req zone=chatbeta burst=20 nodelay;
+    access_log /var/log/nginx/chat-beta.access.log  main if=$loggable;
+    error_log /var/log/nginx/chat-beta.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://chat-beta.paytmdgt.io;
+    rewrite /pcchat/beta/(.*)$ /pcchat/$1 break;
+    proxy_pass $url;
+}

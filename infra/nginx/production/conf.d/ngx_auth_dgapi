@@ -1,0 +1,658 @@
+location ~ ^/user/favourite {
+    access_log /var/log/nginx/frequent.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent.error.log;
+    internal;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://favourites.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/api/frequentorders {
+    limit_req zone=frequent burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/frequent.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite ^/(.*)$ /user/favourite/frequentorders last; # Proxy to internal service
+}
+
+location ~ ^/v1/frequentorders {
+    limit_req zone=frequent burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/frequent.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite ^/(.*)$ /user/favourite/frequentorders last; # Proxy to internal service
+}
+
+location ~ ^/recharge_saga/ {
+    limit_req zone=recharge_saga burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/recharge_saga.access.log  main if=$loggable;
+    error_log  /var/log/nginx/recharge_saga.error.log;
+    set $url http://rechargesaga-internal.paytmdgt.io;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite /recharge_saga/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ^~/recharge_saga_beta/ {
+    limit_req zone=recharge_saga burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/recharge_saga_beta.access.log  main if=$loggable;
+    error_log  /var/log/nginx/recharge_saga_beta.error.log;
+    set $url http://rechargesaga-beta.paytmdgt.io;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite /recharge_saga_beta/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/v2/frequentorders {
+    limit_req zone=frequent burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/frequent.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite ^/(.*)$ /user/favourite/frequentorders last; # Proxy to internal service
+}
+
+location ^~/v2/frequentorders/beta {
+    limit_req zone=frequent burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/frequent-beta.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent-beta.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://favourites.beta.prod.paytmdgt.io;
+    rewrite ^/(.*)$ /user/favourite/frequentorders break;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/expressrecharge/deletefromallsystems {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/deletefromallsystems.access.log main;
+    error_log  /var/log/nginx/deletefromallsystems.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://ffrechargesbff.paytmdgt.io;
+    rewrite ^/(.*) /$1  break;  # replace only host
+    proxy_pass $url;
+}
+
+location ~ ^/v2/user {
+    internal;
+    set $oauthres_code '';
+    proxy_set_header Authorization "Basic cGF5dG0tZGFwLXNlcnZpY2U6NkM0VTJ1cXViMk5vMDRPdHlKaVV3b1paZU51RThnWHU=";
+    proxy_pass http://oauth_proxy.paytm.com;
+}
+
+location ~ ^/cas/v1/s/user {
+    internal;
+    proxy_set_header Accept-Encoding "";
+    proxy_pass http://secure.gamepind.com;
+}
+
+location ~ ^/api/user/favourite/removerecent {
+    limit_req zone=frequent burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/frequent.access.log  main if=$loggable;
+    error_log  /var/log/nginx/frequent.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite ^/(.*)$ /user/favourite/removerecent last; # Proxy to internal service
+}
+
+location ~ ^/protection/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/protection.access.log main;
+    error_log  /var/log/nginx/protection.error.log;
+    set $url https://protection.paytm.com;
+    rewrite_by_lua_file lua/auth/aerospike_auth_userinfo_forwardfail.lua;
+    rewrite /protection/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/auth/protection/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/protection.access.log main;
+    error_log  /var/log/nginx/protection.error.log;
+    set $url https://protection.paytm.com;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    rewrite /auth/protection/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/loyalty/ {
+    access_log /var/log/nginx/loyalty.access.log  main if=$loggable;
+    error_log  /var/log/nginx/loyalty.error.log;
+    limit_req zone=loyalty burst=30 nodelay;
+    default_type application/json;
+    return 200 '{"status":404,"error":"Not Found","message":"Customer not registered for phone number: "}';
+}
+
+location ~ ^/prime/ {
+    limit_req zone=paytm-prime burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://internal-digiatl-paytmprime-alb-1738235271.ap-south-1.elb.amazonaws.com;
+    access_log /var/log/nginx/paytm-prime.access.log  main if=$loggable;
+    error_log  /var/log/nginx/paytm-prime.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite /prime/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/prime-api/ {
+    limit_req zone=paytm-prime burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://prime-api-internal.paytmdgt.io;
+    access_log /var/log/nginx/paytm-prime-api.access.log  main if=$loggable;
+    error_log  /var/log/nginx/paytm-prime-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite /prime-api/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/bills/v1/userConsentStatus {
+    limit_req zone=bills burst=10 nodelay;
+    proxy_set_header Host reminder.prod.paytmdgt.io;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitalreminder.prod.paytmdgt.io;
+    access_log /var/log/nginx/bills_userconsentstatus.access.log main;
+    error_log  /var/log/nginx/bills_userconsentstatus.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    rewrite /bills/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/bill/notificationStatus {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header Host reminder.prod.paytmdgt.io;
+    access_log /var/log/nginx/notificationStatus.access.log main;
+    error_log  /var/log/nginx/notificationStatus.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://digitalreminder.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/bills/v2/bill/notificationStatus {
+    limit_req zone=recharges_bff burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/recharges_bff.access.log main;
+    error_log  /var/log/nginx/recharges_bff.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://ffrechargesbff.paytmdgt.io;
+    rewrite /bills/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/bills/ {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header Host reminder.prod.paytmdgt.io;
+    access_log /var/log/nginx/bills.access.log main;
+    error_log  /var/log/nginx/bills.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://digitalreminder.prod.paytmdgt.io;
+    rewrite /bills/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+
+location ~ ^/bills_beta/v1/userConsentStatus {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header Host digitalreminder-beta.paytmdgt.io;
+    access_log /var/log/nginx/bills_beta_userconsentstatus.access.log main;
+    error_log  /var/log/nginx/bills_beta_userconsentstatus.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://digitalreminder-beta.paytmdgt.io;
+    rewrite /bills_beta/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/bills_beta/ {
+    resolver 10.4.64.2 valid=5s;
+    proxy_set_header Host digitalreminder-beta.paytmdgt.io;
+    access_log /var/log/nginx/bills_beta.access.log main;
+    error_log  /var/log/nginx/bills_beta.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://digitalreminder-beta.paytmdgt.io;
+    rewrite /bills_beta/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/user/mark_paid {
+    limit_req zone=markAsPaid burst=100 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/markAsPaid.access.log  main if=$loggable;
+    error_log  /var/log/nginx/markAsPaid.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+
+    set $url http://internal-digital-favourite-alb-543002917.ap-south-1.elb.amazonaws.com;
+    proxy_pass $url;
+}
+
+location ~ ^/booking/v1/customer/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/booking.access.log main;
+    error_log  /var/log/nginx/booking.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://internal-digital-booking-engine-alb-299786861.ap-south-1.elb.amazonaws.com;
+    rewrite /booking/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/forms/ {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=forms burst=50 nodelay;
+    access_log /var/log/nginx/forms.access.log main;
+    error_log  /var/log/nginx/forms.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_userInfo.lua;
+    set $url http://managefee-internal.prod.paytmdgt.io;
+    proxy_set_header host managefee-internal.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+
+location ~ ^/subscription/ {
+    limit_req zone=subscription burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://internal-digital-favourite-alb-543002917.ap-south-1.elb.amazonaws.com;
+    access_log /var/log/nginx/subscription.access.log main if=$loggable;
+    error_log  /var/log/nginx/subscription.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_upgrade.lua;
+    rewrite /subscription/(.*) /$1  break;
+    proxy_set_header host subscription-internal.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~* /education/explore/auth/v1/course/(?<begin>.*)/(?<end>.*)$ {
+    alias /etc/nginx/json/education/courseResponse.json;
+}
+
+location ~* /education/explore/auth/v1/institute/(?<begin>.*)/(?<end>.*)$ {
+    alias /etc/nginx/json/education/instituteResponse.json;
+}
+
+location ~* /education/explore/auth/v1/search {
+    alias /etc/nginx/json/education/authSearchResponse.json;
+}
+
+
+location ~* /education/explore/auth {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/educationexploreauth.access.log main;
+    error_log  /var/log/nginx/educationexploreauth.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail_education_explore.lua;
+    set $url http://education-service.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_explore_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ^~ /education/coaching/auth {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/educationcoachingauth.access.log main;
+    error_log  /var/log/nginx/educationcoachingauth.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail_education_explore.lua;
+    set $url http://education-service.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_coaching_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ^~ /education/formsfw/ {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/educationformsfwauth.access.log education_forms_log_format;
+    error_log  /var/log/nginx/educationformsfwauth.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_education_form.lua;
+    set $url http://education-formsfw.prod.paytmdgt.io;
+    rewrite /education/formsfw/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_formsfw_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ^~ /education/formfbl/auth/ {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/educationfblauth.access.log education_forms_log_format;
+    error_log  /var/log/nginx/educationfblauth.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_education_form.lua;
+    set $url http://education-formfbl-internal.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_formsfbl_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ~ ^/crm/ {
+    limit_req zone=cst burst=10 nodelay;
+    client_max_body_size 10M;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/crm.access.log main;
+    error_log  /var/log/nginx/crm.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_first.lua;
+    set $url http://crm.prod.paytmdgt.io;
+    rewrite /crm/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-call-service/ {
+    limit_req zone=cst burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-call-service.access.log main;
+    error_log  /var/log/nginx/cst-call-service.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_first.lua;
+    set $url https://cstcallservice-prod.paytmdgt.io;
+    rewrite /cst-call-service/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-ai-service/ {
+    limit_req zone=cst burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-ai-service.access.log main;
+    error_log  /var/log/nginx/cst-ai-service.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_first.lua;
+    set $url https://cstaiservice-prod.paytmdgt.io;
+    rewrite /cst-ai-service/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-timeline-service/ {
+    limit_req zone=cst burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-timeline-service.access.log main;
+    error_log  /var/log/nginx/cst-timeline-service.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_first.lua;
+    set $url https://csttimelineservice-prod.paytmdgt.io;
+    rewrite /cst-timeline-service/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/crm-pfg/ {
+    limit_req zone=cst burst=10 nodelay;
+    client_max_body_size 10M;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/crm-pfg.access.log main;
+    error_log  /var/log/nginx/crm-pfg.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_paytm_first_games.lua;
+    set $url http://crm.prod.paytmdgt.io;
+    rewrite /crm-pfg/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/cst-pfg/ {
+    limit_req zone=cst burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/cst-pfg.access.log  main;
+    error_log  /var/log/nginx/cst-pfg.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_paytm_first_games.lua;
+    set $url http://cst-infra.paytmdgt.io;
+    proxy_set_header host cst-infra.paytmdgt.io;
+    rewrite /cst-pfg/(.*) /cst/$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/v1/user/ticket {
+    limit_req zone=cst burst=10 nodelay;
+    client_max_body_size 10M;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/crm1.access.log main;
+    error_log  /var/log/nginx/crm1.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_first.lua;
+    set $url http://crm.prod.paytmdgt.io;
+    proxy_pass $url;
+}
+
+location ~ ^/billpay/v1/agents/282528395/bill/upipayment {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=billpay burst=10 nodelay;
+    access_log /var/log/nginx/billpayment.access.log main;
+    error_log  /var/log/nginx/billpayment.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url http://digitalbpap-internal.paytmdgt.io;
+    proxy_set_header X-Real-IP $remote_addr;
+    allow 202.145.172.166;
+    allow 202.143.99.164;
+    allow 103.115.212.2;
+    allow 104.115.38.0/24;
+    allow 104.120.139.0/24;
+    allow 104.124.54.0/24;
+    allow 104.71.131.0/24;
+    allow 104.97.78.0/24;
+    allow 115.112.2.0/24;
+    allow 115.248.238.0/24;
+    allow 123.63.250.128/26;
+    allow 124.124.201.128/25;
+    allow 125.56.222.0/24;
+    allow 173.222.148.0/24;
+    allow 173.223.235.0/24;
+    allow 184.50.85.0/24;
+    allow 184.51.151.0/24;
+    allow 184.51.199.0/24;
+    allow 2.16.106.0/24;
+    allow 2.18.240.0/24;
+    allow 23.11.214.0/24;
+    allow 23.11.215.0/24;
+    allow 23.198.11.0/24;
+    allow 23.203.63.0/24;
+    allow 23.205.127.0/24;
+    allow 23.211.135.0/24;
+    allow 23.212.50.0/24;
+    allow 23.216.10.0/24;
+    allow 23.44.4.0/24;
+    allow 23.45.91.0/24;
+    allow 23.57.75.0/24;
+    allow 23.57.76.0/24;
+    allow 23.63.110.0/24;
+    allow 23.65.124.0/24;
+    allow 23.76.156.0/24;
+    allow 23.79.240.0/24;
+    allow 49.44.121.0/25;
+    allow 49.44.137.0/24;
+    allow 49.44.216.0/25;
+    allow 72.246.150.0/24;
+    allow 72.246.216.0/24;
+    allow 96.17.169.0/24;
+    allow 96.17.180.0/24;
+    deny all;
+    rewrite /billpay/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/billpay/ {
+    resolver 10.4.64.2 valid=5s;
+    limit_req zone=billpay burst=10 nodelay;
+    access_log /var/log/nginx/billpayment.access.log main;
+    error_log  /var/log/nginx/billpayment.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    set $url http://digitalbpap-internal.paytmdgt.io;
+    proxy_set_header X-Real-IP $remote_addr;
+    
+    rewrite /billpay/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/digitaltickets/auth/ {
+    limit_req zone=digitaltickets burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitaltickets-internal.paytmdgt.io;
+    access_log /var/log/nginx/digitaltickets.access.log main;
+    error_log  /var/log/nginx/digitaltickets.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    rewrite /digitaltickets/auth/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/digitaltickets_beta/auth/ {
+    limit_req zone=digitaltickets burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://digitaltickets-beta-internal.paytmdgt.io;
+    access_log /var/log/nginx/digitaltickets_beta.access.log main;
+    error_log  /var/log/nginx/digitaltickets_beta.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    rewrite /digitaltickets_beta/auth/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/donation/v1/donation/contributionData {
+    limit_req zone=donationContrib burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://inoperator.prod.paytmdgt.io;
+    access_log /var/log/nginx/rechargeDonationContributionData.access.log  main if=$loggable;
+    error_log  /var/log/nginx/rechargeDonationContributionData.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    rewrite /donation/(.*) /$1  break;
+    proxy_set_header Host inoperator.prod.paytmdgt.io;
+    proxy_pass $url;
+
+}
+
+location ~ ^/donation/ {
+    limit_req zone=donation burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://inoperator.prod.paytmdgt.io;
+    access_log /var/log/nginx/rechargeDonation.access.log  main if=$loggable;
+    error_log  /var/log/nginx/rechargeDonation.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_forwardfail.lua;
+    rewrite /donation/(.*) /$1  break;
+    proxy_set_header Host webappsstatic.paytm.com;
+    proxy_pass $url;
+
+}
+location ~ ^/customerbilldownload/ {
+    limit_req zone=customerbilldownload burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/customerbilldownload.access.log  main if=$loggable;
+    error_log  /var/log/nginx/customerbilldownload.error.log;
+    set $url https://digital-billpayments-customerbills.s3.ap-south-1.amazonaws.com/;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    proxy_http_version     1.1;
+    proxy_set_header       Authorization '';
+    proxy_hide_header      x-amz-id-2;
+    proxy_hide_header      x-amz-request-id;
+    proxy_hide_header      Set-Cookie;
+    proxy_ignore_headers   "Set-Cookie";
+    proxy_buffering        off;
+    proxy_intercept_errors on;
+    if ($request_uri ~ "(.*)customerbilldownload/(.*X-Amz-SignedHeaders=host)(.*)$") {
+        set $presignedurl $2;
+        proxy_pass "${url}${presignedurl}";
+    }
+}
+
+location ~ ^/customerbills/ {
+    limit_req zone=customerbills burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://internal-billpayments-ffrecharge-alb-1231042015.ap-south-1.elb.amazonaws.com;
+    access_log /var/log/nginx/customerbills.access.log main;
+    error_log  /var/log/nginx/customerbills.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+
+    rewrite /customerbills/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ^~ /education/oms/auth {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/educationomsauth.access.log main;
+    error_log  /var/log/nginx/educationomsauth.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_userInfo_education.lua;
+    set $url http://education-oms-internal.prod.paytmdgt.io;
+    rewrite /education/(.*) /$1  break;
+    #log_by_lua_file /etc/nginx/lua/datadog/edu_oms_api_latency.lua;
+    proxy_pass $url;
+}
+
+location ~ ^/ola/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/miniapps_partner_backend.access.log main;
+    error_log /var/log/nginx/miniapps_partner_backend.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url https://miniapps.paytm.com;
+    proxy_pass $url;
+}
+
+location ~ ^/billerservice/auth/ {
+    limit_req zone=billerservice burst=10 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://biller-service-internal.paytmdgt.io;
+    access_log /var/log/nginx/digitalbillerservice.access.log main;
+    error_log  /var/log/nginx/digitalbillerservice.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_new.lua;
+    rewrite /billerservice/auth/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ~ ^/sms/data/v1/ingest/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/sms-data-v1-ingest-prod.access.log main;
+    error_log  /var/log/nginx/sms-data-v1-ingest-prod.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url https://prod-sms-parser-decoupled.mypaytm.com;
+    proxy_connect_timeout 40ms;
+    proxy_send_timeout 40ms;
+    proxy_read_timeout 40ms;    
+    proxy_pass $url;
+}
+
+location ^~/recharges_bff_beta {
+    limit_req zone=recharges_bff burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/recharges_bff-beta.access.log main;
+    error_log  /var/log/nginx/recharges_bff-beta.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://ffrechargesbff-beta.paytmdgt.io;
+    rewrite /recharges_bff_beta/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ^~/recharges_bff {
+    limit_req zone=recharges_bff burst=50 nodelay;
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/recharges_bff.access.log main;
+    error_log  /var/log/nginx/recharges_bff.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth.lua;
+    set $url http://ffrechargesbff.paytmdgt.io;
+    rewrite /recharges_bff/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ^~ /digitalrecharge/ {
+    limit_req zone=digitalrecharge burst=50 nodelay;
+    resolver 10.4.64.2 valid=10s;
+    proxy_connect_timeout 30s;
+    fastcgi_buffers 16 16k;
+    fastcgi_buffer_size 32k;
+    proxy_set_header   X-Real-IP $remote_addr;
+    proxy_set_header   Host      $http_host;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
+    access_log /var/log/nginx/expressrecharge.access.log main;
+    error_log  /var/log/nginx/expressrecharge.error.log;
+    set $url http://digital-recharges-express.prod.paytmdgt.io;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    rewrite /digitalrecharge/(.*) /$1  break;
+    proxy_pass $url;
+}
+
+location ^~ /storecash/ {
+    resolver 10.4.64.2 valid=5s;
+
+    proxy_set_header   X-Real-IP $remote_addr;
+
+    access_log /var/log/nginx/store-cash-block.access.log  main;
+    error_log  /var/log/nginx/store-cash-block.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url https://rewards-int.paytm.com;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+location ~ ^/v2/mobile/getopcirclebyrange {
+    limit_req zone=mnp burst=10 nodelay;
+    access_log /var/log/nginx/mnp.access.log main;
+    error_log  /var/log/nginx/mnp.error.log;
+    resolver 10.4.64.2 valid=5s;
+    set $url http://mnp.prod.paytmdgt.io;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common.lua;
+    proxy_pass $url;
+  #  proxy_set_header Host $host;
+   # proxy_set_header X-Real-IE $remote_addr;
+  }

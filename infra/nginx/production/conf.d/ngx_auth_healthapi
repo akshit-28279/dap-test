@@ -1,0 +1,73 @@
+location ^~ /uhi/utilities {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/utilities-h5-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/utilities-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://health-integrations.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /uhi/discovery {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/discovery-h5-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/discovery-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://health-integrations.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /uhi/orders {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/orders-h5-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/orders-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://health-integrations.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /uhi/postorder {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/postorder-h5-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/postorder-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://health-integrations.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /uat/uhi {
+    resolver 10.4.64.2 valid=5s;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/uat-health-integrations-h5-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/uat-health-integrations-h5-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://health-integrations-uat.paytmdgt.io;
+    rewrite /uat/(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /h5/uhi/ {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/uhi-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/uhi-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://miniapps-uhi.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
+
+location ^~ /h5/pmjay {
+    resolver 10.4.64.2 valid=5s;
+    access_log /var/log/nginx/pmjay-api.access.log main if=$loggable;
+    error_log  /var/log/nginx/pmjay-api.error.log;
+    rewrite_by_lua_file lua/auth/aerospike_auth_common_cors.lua;
+    set $url http://miniapps-pmjay.paytmdgt.io;
+    rewrite /(.*) /$1 break;
+    proxy_pass $url;
+}
